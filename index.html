@@ -1,66 +1,114 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bad Date Slider</title>
-  <style>
-    body { font-family: system-ui, Arial, sans-serif; padding: 32px; }
-    .row { display: flex; align-items: center; gap: 16px; }
-    input[type="range"] { width: min(900px, 90vw); }
-    .tiny { font-size: 12px; opacity: 0.7; }
-    .big { font-size: 28px; font-weight: 700; margin-top: 16px; }
-  </style>
+<meta charset="utf-8">
+<title>My Patreon Resume</title>
+
+<style>
+body{
+font-family:system-ui;
+padding:40px;
+text-align:center;
+}
+
+input[type=range]{
+width:90%;
+}
+
+.labels{
+display:flex;
+justify-content:space-between;
+font-size:12px;
+opacity:.7;
+}
+
+#date{
+font-size:28px;
+font-weight:bold;
+margin-top:20px;
+}
+</style>
+
 </head>
 <body>
-  <h1>Pick a Date</h1>
 
-  <div class="row">
-    <span class="tiny">Jan 01, 0000</span>
-    <input id="s" type="range" min="0" max="3652059" value="0" />
-    <span class="tiny">Dec 31, 9999</span>
-  </div>
+<h1>Select Your Publishing Time (GMT+2)</h1>
 
-  <div id="out" class="big">Jan 01, 0000</div>
-  <div class="tiny">days since Jan 01, 0000: <span id="n">0</span></div>
+<input id="slider" type="range"
+min="0"
+max="315569520000"
+value="0">
 
-  <script>
-    const s = document.getElementById("s");
-    const out = document.getElementById("out");
-    const n = document.getElementById("n");
+<div class="labels">
+<span>Jan 01 0000 00:00:00</span>
+<span>Dec 31 9999 23:59:59</span>
+</div>
 
-    function isLeap(y) {
-      return (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
-    }
+<div id="date">Jan 01 0000 00:00:00</div>
 
-    function daysToDate(totalDays) {
-      let y = 0;
-      let d = totalDays;
+<script>
 
-      while (true) {
-        const diy = isLeap(y) ? 366 : 365;
-        if (d < diy) break;
-        d -= diy;
-        y++;
-      }
+const slider = document.getElementById("slider")
+const output = document.getElementById("date")
 
-      const ml = [31, isLeap(y) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-      let m = 0;
-      while (d >= ml[m]) { d -= ml[m]; m++; }
+function isLeap(y){
+return (y%4===0 && y%100!==0)||y%400===0
+}
 
-      const day = d + 1;
-      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-      return `${months[m]} ${String(day).padStart(2,"0")}, ${String(y).padStart(4,"0")}`;
-    }
+function secondsToDate(sec){
 
-    function render() {
-      const v = Number(s.value);
-      out.textContent = daysToDate(v);
-      n.textContent = String(v);
-    }
+let seconds = sec
 
-    s.addEventListener("input", render);
-    render();
-  </script>
+let year = 0
+
+while(true){
+
+let days = isLeap(year)?366:365
+let yearSeconds = days*86400
+
+if(seconds < yearSeconds) break
+
+seconds -= yearSeconds
+year++
+
+}
+
+let day = Math.floor(seconds/86400)
+seconds -= day*86400
+
+let hour = Math.floor(seconds/3600)
+seconds -= hour*3600
+
+let minute = Math.floor(seconds/60)
+
+let second = seconds%60
+
+const months = [
+31,
+isLeap(year)?29:28,
+31,30,31,30,31,31,30,31,30,31
+]
+
+let month=0
+
+while(day>=months[month]){
+day-=months[month]
+month++
+}
+
+day+=1
+
+const names=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+
+return `${names[month]} ${String(day).padStart(2,'0')} ${String(year).padStart(4,'0')} ${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:${String(second).padStart(2,'0')}`
+
+}
+
+slider.addEventListener("input",()=>{
+output.textContent=secondsToDate(Number(slider.value))
+})
+
+</script>
+
 </body>
 </html>
