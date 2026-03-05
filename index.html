@@ -110,5 +110,96 @@ output.textContent=secondsToDate(Number(slider.value))
 
 </script>
 
+<div style="margin-top:40px; text-align:center;">
+  <h2>Tags</h2>
+  <input id="tags" type="text"
+         placeholder="type tags... (comma or space separated)"
+         style="width:min(900px,90vw); font-size:18px; padding:12px 14px;" />
+  <div style="font-size:12px; opacity:.7; margin-top:8px;">
+    Warning: this field will fight you.
+  </div>
+</div>
+
+<script>
+(() => {
+  const input = document.getElementById("tags");
+
+  const words = {
+    a:["aardvark","abacus","absolute","astronaut","algebra","avalanche"],
+    b:["banana","barge","biscuit","brouhaha","broccoli","blunder"],
+    c:["cabbage","cathedral","cinderblock","cinnamon","cryptid","croissant"],
+    d:["dandelion","dystopia","dinosaur","drizzle","drumstick","dreadnought"],
+    e:["eclipse","ellipsis","eggplant","electric","entangle","euphoria"],
+    f:["ferret","fiasco","flapjack","fjord","frostbite","fungible"],
+    g:["goblin","giraffe","gizmo","glitter","gargoyle","goulash"],
+    h:["hamster","hologram","hurricane","haversack","hydraulic","hyperbole"],
+    i:["igloo","illusion","incognito","infinite","isotope","iridescent"],
+    j:["jalapeno","jamboree","jellyfish","juggernaut","jigsaw","jitterbug"],
+    k:["kangaroo","katana","kaleidoscope","kerfuffle","kilobyte","knickknack"],
+    l:["labyrinth","lollipop","ludicrous","laminate","locomotive","limerick"],
+    m:["macaroni","marmalade","mischief","moonlight","monolith","murmuration"],
+    n:["nachos","nebula","nonsense","nightshade","nitrogen","nostalgia"],
+    o:["octopus","omelette","onomatopoeia","obelisk","oregano","overclock"],
+    p:["pancake","paradox","pterodactyl","pickle","pineapple","poltergeist"],
+    q:["quasar","quiche","quarantine","quicksilver","quibble","quadratic"],
+    r:["raccoon","ravioli","refrigerator","rhapsody","ruckus","rubric"],
+    s:["sardine","sarsaparilla","skeleton","sourdough","spatula","synapse"],
+    t:["tangerine","taxonomy","tesseract","trombone","turnstile","tumbleweed"],
+    u:["umbrella","unicorn","ultraviolet","utopia","undertow","unhinged"],
+    v:["vacuum","valentine","vandalism","velocity","verbatim","vortex"],
+    w:["waffle","wasteland","whiplash","wolverine","wunderkind","widget"],
+    x:["xylophone","xenon","xenolith","xerox","xiphoid","xanthic"],
+    y:["yodel","yesterday","yakitori","yellowhammer","yonder","yarnball"],
+    z:["zebra","zealotry","zamboni","zucchini","zeitgeist","ziggurat"]
+  };
+
+  function randWordStartingWith(letter) {
+    const list = words[letter.toLowerCase()];
+    if (!list || list.length === 0) return letter;
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  // Track last inserted character to ensure we only trigger on typing letters.
+  let lastInsert = null;
+
+  input.addEventListener("beforeinput", (e) => {
+    // Only care about actual text insertion (not deletes, pastes, etc.)
+    if (e.inputType === "insertText" && typeof e.data === "string") {
+      lastInsert = e.data;
+    } else {
+      lastInsert = null;
+    }
+  });
+
+  input.addEventListener("input", () => {
+    const ch = lastInsert;
+    lastInsert = null;
+
+    if (!ch || ch.length !== 1) return;
+    if (!/[a-zA-Z]/.test(ch)) return;
+
+    const v = input.value;
+
+    // Find start of current token (after last comma or space).
+    const lastComma = v.lastIndexOf(",");
+    const lastSpace = v.lastIndexOf(" ");
+    const start = Math.max(lastComma, lastSpace) + 1;
+
+    const prefix = v.slice(0, start);
+    const token = v.slice(start);
+
+    // If token is empty or whitespace, bail.
+    if (!token || !token.trim()) return;
+
+
+    const w = randWordStartingWith(ch);
+    input.value = prefix + w;
+
+    input.setSelectionRange(input.value.length, input.value.length);
+  });
+})();
+</script>
+
+  
 </body>
 </html>
